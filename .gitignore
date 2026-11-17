@@ -1,0 +1,14 @@
+# Environment & Secrets
+.env
+.env.local
+*.env
+
+# Binaries & build artifacts
+tmp/
+main
+*.exe
+*.test
+gh.tar.gz
+
+# OS metadata
+.DS_Store
