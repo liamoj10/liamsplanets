@@ -8,22 +8,37 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/liamoj10/liamsplanets/internal/simulation"
+	"github.com/liamoj10/liamsplanets/internal/transport"
 )
 
 func main() {
-	// 1. Initialize routing using standard library ServeMux
+	// 1. Initialize Simulation Engine
+	engine := simulation.NewEngine()
+
+	// Start simulation loop at 60 ticks per second (~16ms)
+	engine.Start(16 * time.Millisecond)
+
+	// 2. Initialize Transport Handler
+	handler := transport.NewHandler(engine)
+
+	// 3. Routing
 	mux := http.NewServeMux()
 
-	// Serve the frontend static assets (HTML/JS/Canvas) from ./web
+	// Serve the frontend static assets (HTML/JS/CSS) from ./web
 	fileServer := http.FileServer(http.Dir("./web"))
 	mux.Handle("/", fileServer)
 
-	// Placeholder endpoint for WebSocket connection (Target: SOL-02)
+	// Endpoint polled by the UI: GET /state
+	mux.HandleFunc("/state", handler.HandleGetState)
+
+	// Placeholder endpoint for future WebSocket connection
 	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("WebSocket simulation stream endpoint (Coming in SOL-02)"))
+		w.Write([]byte("WebSocket simulation stream endpoint (Coming soon)"))
 	})
 
-	// 2. Configure the HTTP server
+	// 4. Configure HTTP Server
 	srv := &http.Server{
 		Addr:         ":8080",
 		Handler:      mux,
@@ -32,7 +47,7 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	// 3. Start server in a background goroutine so it doesn't block shutdown handling
+	// 5. Start server in a background goroutine
 	go func() {
 		log.Printf("Starting server on http://localhost:8080")
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -40,14 +55,14 @@ func main() {
 		}
 	}()
 
-	// 4. Set up graceful shutdown channel listening for SIGINT (Ctrl+C) or SIGTERM
+	// 6. Graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	<-quit
 
 	log.Println("Shutting down server gracefully...")
+	engine.Stop()
 
-	// Give active connections/simulation loops 5 seconds to wrap up
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

@@ -1,90 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liam's Solar System Simulator</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #0b0f19;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            color: #f3f4f6;
-        }
-        #ui-overlay {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            pointer-events: none;
-            z-index: 10;
-        }
-        h1 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            margin-bottom: 4px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-        p {
-            font-size: 0.875rem;
-            color: #9ca3af;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-        }
-        canvas {
-            display: block;
-            width: 100vw;
-            height: 100vh;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solar System Simulator</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-    <div id="ui-overlay">
-        <h1>Solar System Simulator</h1>
-        <p>Status: Local Development (Awaiting SOL-03 Canvas Render)</p>
+  <!-- Title & Status -->
+  <div id="header">
+    <h1>Solar System Simulator</h1>
+    <div id="status">Connecting to GET /state...</div>
+  </div>
+
+  <!-- Planet Canvas Viewport -->
+  <canvas id="spaceCanvas"></canvas>
+
+  <!-- Planet Inspector Sidebar -->
+  <aside id="inspector">
+    <div id="inspector-title">
+      <span id="inspector-dot"></span>
+      <span id="planet-name">Select Planet</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Position</span>
+      <span class="stat-val" id="stat-pos">-</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Velocity</span>
+      <span class="stat-val" id="stat-vel">-</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Speed</span>
+      <span class="stat-val" id="stat-speed">-</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Radius</span>
+      <span class="stat-val" id="stat-radius">-</span>
     </div>
 
-    <canvas id="spaceCanvas"></canvas>
+    <!-- Quick list of bodies -->
+    <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; margin-top: 6px;">Planets</div>
+    <div id="planet-list"></div>
+  </aside>
 
-    <script>
-        const canvas = document.getElementById('spaceCanvas');
-        const ctx = canvas.getContext('2d');
-
-        // Handle high-DPI (Retina) displays for crisp rendering
-        function resizeCanvas() {
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = window.innerWidth * dpr;
-            canvas.height = window.innerHeight * dpr;
-            ctx.scale(dpr, dpr);
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // Basic render loop placeholder
-        function render() {
-            // Clear screen with deep space background color
-            ctx.fillStyle = '#0b0f19';
-            ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-
-            // Placeholder guidance text on canvas
-            ctx.fillStyle = '#4b5563';
-            ctx.font = '14px monospace';
-            ctx.textAlign = 'center';
-            ctx.fillText('Canvas ready. Server sync coming in SOL-03.', window.innerWidth / 2, window.innerHeight / 2);
-
-            requestAnimationFrame(render);
-        }
-
-        // Kick off the loop
-        requestAnimationFrame(render);
-    </script>
+  <script src="/app.js"></script>
 </body>
 </html>
